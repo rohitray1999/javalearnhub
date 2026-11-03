@@ -52,6 +52,7 @@ public class DashboardController {
         return "dashboard";
     }
 
+    //ROHIT RAY
     @PostMapping("/dashboard/goal")
     public String saveGoal(@RequestParam int dailyMinutes,
                            @RequestParam(required = false)
