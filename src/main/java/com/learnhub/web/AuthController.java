@@ -26,6 +26,8 @@ public class AuthController {
         return "register";
     }
 
+    //for register **rohitray
+
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("form") RegisterForm form, BindingResult br) {
         if (!br.hasFieldErrors("email") && users.emailTaken(form.getEmail())) {
