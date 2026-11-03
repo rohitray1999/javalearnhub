@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | JavaLearnHub'">JavaLearnHub</title>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+
+    <script>
+        (function () {
+            var saved = localStorage.getItem('theme');
+            var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-bs-theme', saved || (dark ? 'dark' : 'light'));
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" th:href="@{/css/site.css}">
+    <link rel="icon" href="data:,">
+</head>
+
+<body>
+
+<nav th:fragment="navbar" class="navbar navbar-expand-lg lh-nav sticky-top">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}"><i class="bi bi-cup-hot-fill me-2"></i>JavaLearnHub</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" th:href="@{/learn}">Learn</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/paths}">Paths</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/interview}">Interview</a></li>
+            </ul>
+
+            <form class="d-flex me-lg-3 mb-2 mb-lg-0" role="search" th:action="@{/search}" method="get">
+                <input class="form-control form-control-sm" type="search" name="q"
+                       placeholder="Search lessons" aria-label="Search lessons">
+            </form>
+
+            <button id="themeToggle" type="button" class="btn btn-sm btn-outline-secondary me-lg-3 mb-2 mb-lg-0"
+                    aria-label="Toggle dark mode">
+                <i class="bi bi-moon-stars"></i>
+            </button>
+
+            <div sec:authorize="isAnonymous()" class="d-flex gap-2">
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/login}">Log in</a>
+                <a class="btn btn-sm btn-primary" th:href="@{/register}">Sign up free</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2 me-1"></i><span sec:authentication="principal.displayName">You</span>
+                </a>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Log out</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div th:fragment="flash" th:if="${flash != null}" class="container mt-3">
+    <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${flash}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+
+<footer th:fragment="footer" class="lh-footer mt-5 py-4">
+    <div class="container d-flex flex-wrap justify-content-between gap-2 small">
+        <span>JavaLearnHub. Free Java, Spring Boot and microservices lessons.</span>
+        <span>
+            <a th:href="@{/learn}">Lessons</a> &middot;
+            <a th:href="@{/paths}">Paths</a> &middot;
+            <a th:href="@{/interview}">Interview questions</a>
+        </span>
+    </div>
+</footer>
+
+<th:block th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+</th:block>
+
+</body>
+</html>

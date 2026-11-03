@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Java interview questions')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container py-4" style="max-width: 900px;">
+    <h1 class="h2 mb-1">Java interview questions</h1>
+    <p class="text-body-secondary mb-3">
+        Questions by experience level, from fresher to senior, with detailed answers.
+        Try answering out loud first, then open the answer.
+    </p>
+
+    <form class="row g-2 align-items-end mb-3" th:action="@{/interview}" method="get">
+        <div class="col-6 col-md-3">
+            <label for="level" class="form-label small mb-1">Experience</label>
+            <select id="level" name="level" class="form-select" data-autosubmit>
+                <option value="">All levels</option>
+                <option th:each="l : ${levels}" th:value="${l}" th:text="${l} + ' years'"
+                        th:selected="${level == l}">0-1 years</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-4">
+            <label for="topic" class="form-label small mb-1">Topic</label>
+            <select id="topic" name="topic" class="form-select" data-autosubmit>
+                <option value="">All topics</option>
+                <option th:each="t : ${topics}" th:value="${t}" th:text="${t}"
+                        th:selected="${topic == t}">Core Java</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-5">
+            <label for="interviewFilter" class="form-label small mb-1">Search on this page</label>
+            <input id="interviewFilter" type="search" class="form-control" placeholder="For example: HashMap, deadlock, saga">
+        </div>
+    </form>
+
+    <p class="small text-body-secondary mb-4">
+        Showing <strong th:text="${shown}">0</strong> of <span th:text="${total}">0</span> questions
+        <a class="ms-2" th:if="${!level.isEmpty() or !topic.isEmpty()}" th:href="@{/interview}">Clear filters</a>
+    </p>
+
+    <p th:if="${byTopic.isEmpty()}" class="text-body-secondary">No questions match these filters.</p>
+
+    <section class="mb-5" th:each="entry : ${byTopic}">
+        <h2 class="h5 mb-2" th:text="${entry.key}">Topic</h2>
+        <div class="accordion">
+            <div class="accordion-item interview-item" th:each="item : ${entry.value}">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            th:attr="data-bs-target='#a' + ${item.q().id}">
+                        <span class="me-3" th:text="${item.q().question}">Question</span>
+                        <span class="badge ms-auto text-nowrap" th:classappend="${item.badgeClass()}"
+                              th:text="${item.q().experience} + ' yrs'">0-1 yrs</span>
+                    </button>
+                </h3>
+                <div class="accordion-collapse collapse" th:id="'a' + ${item.q().id}">
+                    <div class="accordion-body lesson-body" th:utext="${item.answerHtml()}"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

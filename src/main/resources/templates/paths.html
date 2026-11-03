@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Learning paths')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container py-4">
+    <h1 class="h2 mb-1">Learning paths</h1>
+    <p class="text-body-secondary mb-4">Each path puts the right lessons in order for one goal.</p>
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-4" th:each="p : ${paths}">
+            <a class="path-tile h-100" th:href="@{/paths/{slug}(slug=${p.slug})}">
+                <span class="badge text-bg-primary mb-2" th:text="${p.levelName}">Beginner</span>
+                <h2 class="h5" th:text="${p.title}">Path</h2>
+                <p class="text-body-secondary" th:text="${p.description}">desc</p>
+                <span class="small fw-semibold" th:text="${#lists.size(p.lessons)} + ' lessons'">4 lessons</span>
+            </a>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

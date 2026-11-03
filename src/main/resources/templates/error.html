@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Page not found')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container py-5 text-center">
+    <div class="stat-num" th:text="${status != null} ? ${status} : 'Error'">404</div>
+    <h1 class="h3 mt-2">This page could not be found.</h1>
+    <p class="text-body-secondary">The link may be old, or the lesson may have moved.</p>
+    <a class="btn btn-primary" th:href="@{/learn}">Browse all lessons</a>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

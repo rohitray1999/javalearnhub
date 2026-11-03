@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container py-4">
+    <h1 class="h2 mb-4">Hi, <span sec:authentication="principal.displayName">there</span></h1>
+
+    <!-- Resume -->
+    <section class="resume-box mb-4" th:if="${resume != null}">
+        <div>
+            <div class="small text-body-secondary">Continue where you left off</div>
+            <div class="h5 mb-0" th:text="${resume.title}">Next lesson</div>
+        </div>
+        <a class="btn btn-primary" th:href="@{/learn/{slug}(slug=${resume.slug})}">Resume lesson</a>
+    </section>
+    <section class="resume-box mb-4" th:if="${resume == null}">
+        <div class="h5 mb-0">You finished every lesson. New lessons will show up here.</div>
+    </section>
+
+    <!-- Stats -->
+    <section class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="stat-box">
+                <div class="stat-num" th:text="${percent} + '%'">0%</div>
+                <div class="small text-body-secondary" th:text="${finished} + ' of ' + ${total} + ' lessons'">0 of 9</div>
+                <div class="progress mt-2" style="height:6px" role="progressbar" aria-label="Overall progress">
+                    <div class="progress-bar" th:style="'width:' + ${percent} + '%'"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-box">
+                <div class="stat-num"><i class="bi bi-fire streak-icon me-1"></i><span th:text="${streak}">0</span></div>
+                <div class="small text-body-secondary">day streak</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-box">
+                <div class="stat-num" th:text="${minutesToday}">0</div>
+                <div class="small text-body-secondary" th:text="'minutes today, goal ' + ${goal.dailyMinutes}">minutes today</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-box">
+                <div class="stat-num" th:text="${minutesWeek}">0</div>
+                <div class="small text-body-secondary">minutes in the last 7 days</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <h2 class="h5">Your goal</h2>
+            <form class="card card-body" th:action="@{/dashboard/goal}" method="post">
+                <div class="mb-3">
+                    <label for="dailyMinutes" class="form-label">Minutes per day</label>
+                    <input type="number" id="dailyMinutes" name="dailyMinutes" class="form-control"
+                           min="5" max="600" th:value="${goal.dailyMinutes}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="targetDate" class="form-label">Target finish date (optional)</label>
+                    <input type="date" id="targetDate" name="targetDate" class="form-control"
+                           th:value="${goal.targetDate}">
+                </div>
+                <button class="btn btn-primary align-self-start" type="submit">Save goal</button>
+            </form>
+            <p class="mt-3 mb-0" th:if="${finishDate != null}">
+                At your current pace you will finish all lessons around
+                <strong th:text="${#temporals.format(finishDate, 'dd MMM yyyy')}">01 Jan 2027</strong>.
+            </p>
+            <p class="mt-3 mb-0 text-body-secondary" th:if="${finishDate == null}">
+                Complete a few lessons and your estimated finish date will appear here.
+            </p>
+        </div>
+
+        <div class="col-lg-6">
+            <h2 class="h5">Bookmarks</h2>
+            <p class="text-body-secondary" th:if="${bookmarks.isEmpty()}">Bookmark a lesson to find it here later.</p>
+            <div class="list-group mb-4" th:if="${!bookmarks.isEmpty()}">
+                <a class="list-group-item list-group-item-action" th:each="l : ${bookmarks}"
+                   th:href="@{/learn/{slug}(slug=${l.slug})}" th:text="${l.title}">Lesson</a>
+            </div>
+
+            <h2 class="h5">Recent quiz results</h2>
+            <p class="text-body-secondary" th:if="${attempts.isEmpty()}">Take a quiz at the end of any lesson.</p>
+            <ul class="list-group" th:if="${!attempts.isEmpty()}">
+                <li class="list-group-item d-flex justify-content-between" th:each="a : ${attempts}"
+                    th:with="l=${lessonById.get(a.lessonId)}">
+                    <span th:text="${l != null} ? ${l.title} : 'Lesson'">Lesson</span>
+                    <span>
+                        <strong th:text="${a.score} + ' / ' + ${a.total}">3 / 3</strong>
+                        <span class="small text-body-secondary ms-2" th:text="${#temporals.format(a.attemptedAt, 'dd MMM, HH:mm')}">date</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
