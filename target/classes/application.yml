@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: javalearnhub
+  datasource:
+    # Default: file based H2 (zero setup). Postgres ke liye: --spring.profiles.active=postgres
+    url: jdbc:h2:file:./data/learnhub;AUTO_SERVER=TRUE
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    # Templates lazy associations (stage.lessons) read karte hain, isliye true
+    open-in-view: true
+  thymeleaf:
+    cache: false
+server:
+  port: 8080

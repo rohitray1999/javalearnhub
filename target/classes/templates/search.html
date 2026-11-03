@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Search')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container py-4" style="max-width: 820px;">
+    <h1 class="h3">Search lessons</h1>
+    <form class="d-flex gap-2 my-3" th:action="@{/search}" method="get">
+        <input class="form-control" type="search" name="q" th:value="${q}" placeholder="For example: HashMap" autofocus>
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+
+    <p class="text-body-secondary" th:if="${q.isBlank()}">Type a topic to find matching lessons.</p>
+    <p th:if="${!q.isBlank() and results.isEmpty()}">
+        No lessons match "<span th:text="${q}"></span>". Try a shorter word, or <a th:href="@{/learn}">browse all lessons</a>.
+    </p>
+    <div class="list-group" th:if="${!results.isEmpty()}">
+        <a class="list-group-item list-group-item-action" th:each="l : ${results}"
+           th:href="@{/learn/{slug}(slug=${l.slug})}">
+            <span class="fw-semibold" th:text="${l.title}">Lesson</span>
+            <span class="d-block small text-body-secondary" th:text="${l.stage.title} + ': ' + ${l.summary}">summary</span>
+        </a>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

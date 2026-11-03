@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(${lesson.title})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container py-4">
+    <div class="row g-4">
+
+        <aside class="col-lg-3 order-lg-1 order-2">
+            <div class="lesson-sidebar">
+                <div class="fw-semibold mb-2" th:text="${stage.title}">Stage</div>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action px-0 border-0"
+                       th:each="l : ${stage.lessons}"
+                       th:href="@{/learn/{slug}(slug=${l.slug})}"
+                       th:classappend="${l.id == lesson.id} ? 'active-lesson'">
+                        <i class="bi me-2" th:classappend="${done.contains(l.id)} ? 'bi-check-circle-fill text-success' : 'bi-circle text-body-tertiary'"></i>
+                        <span th:text="${l.title}">Lesson</span>
+                    </a>
+                </div>
+                <a class="small d-block mt-3" th:href="@{/learn}"><i class="bi bi-arrow-left me-1"></i>All lessons</a>
+            </div>
+        </aside>
+
+        <article class="col-lg-9 order-lg-2 order-1">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item"><a th:href="@{/learn}">Learn</a></li>
+                    <li class="breadcrumb-item" th:text="${stage.title}">Stage</li>
+                </ol>
+            </nav>
+
+            <h1 class="lesson-title" th:text="${lesson.title}">Lesson title</h1>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="badge text-bg-primary" th:if="${lesson.minJavaVersion != null}"
+                      th:text="'Java ' + ${lesson.minJavaVersion} + '+'">Java 8+</span>
+                <span class="badge text-bg-secondary" th:text="${lesson.readMinutes} + ' min read'">6 min</span>
+                <span class="badge text-bg-success" th:if="${isDone}"><i class="bi bi-check2 me-1"></i>Completed</span>
+            </div>
+
+            <div class="lesson-body" th:utext="${html}"></div>
+
+            <!-- Actions -->
+            <div class="d-flex flex-wrap gap-2 my-4 pt-3 border-top">
+                <div sec:authorize="isAuthenticated()" class="d-flex flex-wrap gap-2">
+                    <form th:action="@{/learn/{slug}/complete(slug=${lesson.slug})}" method="post" th:unless="${isDone}">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle me-1"></i>Mark as complete</button>
+                    </form>
+                    <form th:action="@{/learn/{slug}/bookmark(slug=${lesson.slug})}" method="post">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="bi" th:classappend="${bookmarked} ? 'bi-bookmark-fill' : 'bi-bookmark'"></i>
+                            <span th:text="${bookmarked} ? 'Bookmarked' : 'Bookmark'">Bookmark</span>
+                        </button>
+                    </form>
+                </div>
+                <div sec:authorize="isAnonymous()" class="text-body-secondary">
+                    <a th:href="@{/login}">Log in</a> or <a th:href="@{/register}">create a free account</a>
+                    to track progress, bookmark lessons and keep notes.
+                </div>
+            </div>
+
+            <!-- Quiz -->
+            <section class="quiz-box mb-4" th:if="${!questions.isEmpty()}">
+                <h2 class="h4 mb-3"><i class="bi bi-patch-question me-2"></i>Check your understanding</h2>
+                <form id="quizForm" th:data-url="@{/api/quiz/{id}/submit(id=${lesson.id})}">
+                    <div class="q mb-4" th:each="q, qi : ${questions}" th:attr="data-id=${q.id()}">
+                        <p class="fw-semibold mb-2" th:text="${qi.count} + '. ' + ${q.question()}">Question</p>
+                        <div class="form-check" th:each="opt, oi : ${q.options()}">
+                            <input class="form-check-input" type="radio"
+                                   th:name="'q' + ${q.id()}" th:value="${oi.index}"
+                                   th:id="'q' + ${q.id()} + 'o' + ${oi.index}">
+                            <label class="form-check-label" th:for="'q' + ${q.id()} + 'o' + ${oi.index}" th:text="${opt}">Option</label>
+                        </div>
+                        <div class="q-feedback small mt-2"></div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Check answers</button>
+                    <span id="quizResult" class="ms-3 fw-semibold"></span>
+                </form>
+            </section>
+
+            <!-- Notes -->
+            <section class="mb-4" sec:authorize="isAuthenticated()">
+                <h2 class="h5"><i class="bi bi-journal-text me-2"></i>Your notes</h2>
+                <form th:action="@{/learn/{slug}/note(slug=${lesson.slug})}" method="post">
+                    <textarea name="note" class="form-control mb-2" rows="4" maxlength="5000"
+                              placeholder="Write what you want to remember" th:text="${note}"></textarea>
+                    <button class="btn btn-sm btn-outline-primary" type="submit">Save note</button>
+                </form>
+            </section>
+
+            <!-- Prev / Next -->
+            <div class="d-flex justify-content-between gap-2 mt-4">
+                <a class="btn btn-outline-secondary" th:if="${nav.prev() != null}"
+                   th:href="@{/learn/{slug}(slug=${nav.prev().slug})}">
+                    <i class="bi bi-arrow-left me-1"></i><span th:text="${nav.prev().title}">Previous</span>
+                </a>
+                <span th:if="${nav.prev() == null}"></span>
+                <a class="btn btn-primary" th:if="${nav.next() != null}"
+                   th:href="@{/learn/{slug}(slug=${nav.next().slug})}">
+                    <span th:text="${nav.next().title}">Next</span><i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </article>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

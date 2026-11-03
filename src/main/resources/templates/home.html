@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Learn Java, Spring Boot and microservices')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<header class="lh-hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h1 class="display-4 mb-3">Learn Java the way it is used at work.</h1>
+                <p class="lead mb-4">Short lessons with runnable code, a quiz after each one, and clear paths from your first
+                    program to Spring Boot and microservices. Reading is free, no account needed.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-primary btn-lg" th:href="@{/paths}">Pick a learning path</a>
+                    <a class="btn btn-outline-primary btn-lg" th:href="@{/learn}">Browse all lessons</a>
+                </div>
+                <ul class="list-inline mt-4 mb-0 small text-body-secondary">
+                    <li class="list-inline-item me-3"><i class="bi bi-check2 me-1"></i>No sign-up to read</li>
+                    <li class="list-inline-item me-3"><i class="bi bi-check2 me-1"></i>Beginner to advanced</li>
+                    <li class="list-inline-item"><i class="bi bi-check2 me-1"></i>Quiz after every lesson</li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <div class="code-card shadow-sm">
+                    <div class="code-card-bar">
+                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        <span class="ms-2 small">Hello.java</span>
+                    </div>
+<pre class="m-0"><code class="language-java">public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, Java!");
+    }
+}</code></pre>
+                    <div class="code-card-out"><span class="text-body-secondary">$ java Hello</span><br>Hello, Java!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container py-5">
+
+    <section class="row text-center g-4 mb-5">
+        <div class="col-4"><div class="stat-num" th:text="${lessonCount}">9</div><div class="text-body-secondary">lessons</div></div>
+        <div class="col-4"><div class="stat-num" th:text="${stages.size()}">6</div><div class="text-body-secondary">stages</div></div>
+        <div class="col-4"><div class="stat-num" th:text="${quizCount}">27</div><div class="text-body-secondary">quiz questions</div></div>
+    </section>
+
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h2 class="h3 mb-0">Choose a path for your goal</h2>
+            <a th:href="@{/paths}">All paths</a>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4" th:each="p : ${paths}">
+                <a class="path-tile" th:href="@{/paths/{slug}(slug=${p.slug})}">
+                    <span class="badge text-bg-primary mb-2" th:text="${p.levelName}">Beginner</span>
+                    <h3 class="h5" th:text="${p.title}">Path</h3>
+                    <p class="mb-2 text-body-secondary" th:text="${p.description}">desc</p>
+                    <span class="small fw-semibold" th:text="${#lists.size(p.lessons)} + ' lessons'">4 lessons</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <h2 class="h3 mb-3">From first program to production</h2>
+        <ol class="stage-list">
+            <li th:each="s : ${stages}">
+                <div class="fw-semibold" th:text="${s.title}">Stage</div>
+                <div class="text-body-secondary small" th:text="${s.description}">desc</div>
+                <div class="small mt-1">
+                    <span th:each="l, it : ${s.lessons}">
+                        <a th:href="@{/learn/{slug}(slug=${l.slug})}" th:text="${l.title}">Lesson</a><span th:unless="${it.last}"> &middot; </span>
+                    </span>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section class="row g-4 mb-5">
+        <div class="col-md-4 feature">
+            <h3 class="h5"><i class="bi bi-lightbulb me-2"></i>Learn by doing</h3>
+            <p class="mb-0">Every lesson has code you can copy and run, and a short quiz with explanations.</p>
+        </div>
+        <div class="col-md-4 feature">
+            <h3 class="h5"><i class="bi bi-graph-up-arrow me-2"></i>See your progress</h3>
+            <p class="mb-0">A free account tracks finished lessons, study minutes, streaks and an estimated finish date.</p>
+        </div>
+        <div class="col-md-4 feature">
+            <h3 class="h5"><i class="bi bi-briefcase me-2"></i>Prepare for interviews</h3>
+            <p class="mb-0">Common Java and Spring questions, each with a short and clear answer.</p>
+        </div>
+    </section>
+
+    <section class="cta text-center">
+        <h2 class="h3">Your first lesson takes six minutes.</h2>
+        <a class="btn btn-primary btn-lg mt-2" th:href="@{/learn/how-java-runs}">Start with how Java runs</a>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
